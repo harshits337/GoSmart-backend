@@ -42,6 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryDto updateCategory(CategoryDto categoryDto) {
         Category category = findCatById(categoryDto.getId());
         category.setName(categoryDto.getName());
@@ -83,7 +84,7 @@ public class CategoryServiceImpl implements CategoryService {
         return modelMapper.map(category,CategoryDto.class);
     }
 
-    Category findCatById(String categoryId){
+    public Category findCatById(String categoryId){
         return categoryRepo.findById(categoryId).orElseThrow(()-> new ResourceNotFoundException("Invalid Category Id"));
     }
 }
