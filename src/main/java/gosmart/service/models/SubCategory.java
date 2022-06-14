@@ -1,18 +1,26 @@
-package gosmart.service.dto;
+package gosmart.service.models;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryDto {
+@Entity
+@Builder
+public class SubCategory {
 
+    @Id
     private String id;
+
+    @NotEmpty
+    private String categoryId;
 
     @NotEmpty
     private String name;
@@ -20,9 +28,8 @@ public class CategoryDto {
     @NotEmpty
     private String description;
 
-    List<SubCategoryDto> subCategories;
-
     private String createdAt;
 
     private String updatedAt;
+
 }

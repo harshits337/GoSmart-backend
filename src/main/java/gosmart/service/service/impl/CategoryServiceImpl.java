@@ -1,10 +1,14 @@
 package gosmart.service.service.impl;
 
 import gosmart.service.dto.CategoryDto;
+import gosmart.service.dto.SubCategoryDto;
 import gosmart.service.exceptions.ResourceNotFoundException;
 import gosmart.service.models.Category;
+import gosmart.service.models.SubCategory;
 import gosmart.service.repository.CategoryRepo;
+import gosmart.service.repository.SubCategoryRepo;
 import gosmart.service.service.CategoryService;
+import gosmart.service.service.SubCategoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    SubCategoryService subCategoryService;
 
     @Override
     @Transactional
@@ -47,13 +53,19 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getCategoryDetailsById(String categoryId) {
         Category category = findCatById(categoryId);
-        return categoryToDto(category);
+        CategoryDto categoryDto = categoryToDto(category);
+        categoryDto.setSubCategories(subCategoryService.getAllSubCategoriesForCategoryId(categoryId));
+        return categoryDto;
     }
 
     @Override
     public List<CategoryDto> getAllCategories() {
         List<Category> categoryList = categoryRepo.findAll();
-        List<CategoryDto> categoryDtoList = categoryList.stream().map(category -> categoryToDto(category)).collect(Collectors.toList());
+        List<CategoryDto> categoryDtoList = categoryList.stream().map(category -> {
+            CategoryDto categoryDto = categoryToDto(category);
+            categoryDto.setSubCategories(subCategoryService.getAllSubCategoriesForCategoryId(categoryDto.getId()));
+            return categoryDto;
+        }).collect(Collectors.toList());
         return categoryDtoList;
     }
 
