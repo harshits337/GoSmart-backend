@@ -1,5 +1,6 @@
 package gosmart.service.dto;
 
+import gosmart.service.models.Inventory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,8 @@ public class ProductDto {
 
     @NotEmpty
     private String price;
+
+    private Inventory inventory;
 
     private String createdAt;
 

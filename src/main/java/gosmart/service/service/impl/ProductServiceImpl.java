@@ -2,11 +2,13 @@ package gosmart.service.service.impl;
 
 import gosmart.service.dto.ProductDto;
 import gosmart.service.exceptions.ResourceNotFoundException;
+import gosmart.service.models.Inventory;
 import gosmart.service.models.Product;
 import gosmart.service.repository.CategoryRepo;
 import gosmart.service.repository.ProductRepo;
 import gosmart.service.repository.SubCategoryRepo;
 import gosmart.service.service.CategoryService;
+import gosmart.service.service.InventoryService;
 import gosmart.service.service.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     SubCategoryRepo subCategoryRepo;
 
+    @Autowired
+    InventoryService inventoryService;
+
     @Override
     @Transactional
     public ProductDto addProduct(ProductDto productDto) {
@@ -47,7 +52,14 @@ public class ProductServiceImpl implements ProductService {
         product.setId(UUID.randomUUID().toString());
         product.setCreatedAt(Instant.now().toString());
         productRepo.save(product);
-        return productToDto(product);
+        Inventory inventory = Inventory.builder()
+                .productId(product.getId())
+                .stockUnits(5)
+                .build();
+        inventoryService.addInventory(inventory);
+        ProductDto savedProductDto = productToDto(product);
+        savedProductDto.setInventory(inventory);
+        return savedProductDto;
     }
 
     @Override
@@ -64,13 +76,20 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto getProductDetailsById(String productId) {
         Product product = findProductById(productId);
-        return productToDto(product);
+        ProductDto productDto = productToDto(product);
+        productDto.setInventory(inventoryService.getInventoryForProductId(productId));
+        return productDto;
     }
 
     @Override
     public List<ProductDto> getProductsByCategory(String categoryId) {
         List<Product> products = productRepo.findByCategoryId(categoryId);
-        List<ProductDto> productDtoList = products.stream().map(product -> productToDto(product)).collect(Collectors.toList());
+        List<ProductDto> productDtoList = products.stream().map(product -> {
+            ProductDto productDto = productToDto(product);
+            System.out.println(productDto.toString());
+            productDto.setInventory(inventoryService.getInventoryForProductId(product.getId()));
+            return productDto;
+        }).collect(Collectors.toList());
         return productDtoList;
     }
 
