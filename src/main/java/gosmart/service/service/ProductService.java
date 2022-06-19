@@ -1,8 +1,9 @@
 package gosmart.service.service;
 
 import gosmart.service.dto.ProductDto;
-import gosmart.service.models.Product;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ProductService {
@@ -11,7 +12,9 @@ public interface ProductService {
 
     public ProductDto updateProduct(ProductDto productDto);
 
-    public ProductDto getProductDetailsById(String productId);
+    public void addImageToProduct(MultipartFile file, String productId) throws IOException;
+
+    public ProductDto getProductDetailsById(String productId) throws IOException;
 
     public List<ProductDto> getProductsByCategory(String categoryId);
 

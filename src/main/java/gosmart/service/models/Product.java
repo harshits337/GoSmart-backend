@@ -23,6 +23,9 @@ public class Product {
     private String categoryId;
 
     @NotEmpty
+    private String brand;
+
+    @NotEmpty
     private String subCategoryId;
 
     @NotEmpty
@@ -30,6 +33,8 @@ public class Product {
 
     @NotEmpty
     private String details;
+
+    private String imageName;
 
     @NotEmpty
     private String price;
