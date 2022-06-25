@@ -15,4 +15,6 @@ public interface UserService {
     public List<UserDto> getAllUsers();
 
     public void deleteUserById(String userId);
+
+    public UserDto getUserDetailsByEmail(String email);
 }

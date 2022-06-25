@@ -1,8 +1,10 @@
 package gosmart.service.utils;
 
+import gosmart.service.dto.JwtResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +52,8 @@ public class JwtTokenHelper {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("user",userDetails);
-        return doGenerateToken(claims, userDetails.getUsername());
+        String token =  doGenerateToken(claims, userDetails.getUsername());
+        return token;
     }
 
     //while creating the token -
