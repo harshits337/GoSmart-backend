@@ -12,4 +12,6 @@ public interface CartService {
     public List<CartDto> getAllItemsInCart(String userId);
 
     public void deleteItemFromCart(String id);
+
+    public void clearCart (String userId);
 }

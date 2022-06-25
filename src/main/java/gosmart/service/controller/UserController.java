@@ -1,11 +1,20 @@
 package gosmart.service.controller;
 
 import gosmart.service.dto.ApiResponse;
+import gosmart.service.dto.JwtAuthRequest;
+import gosmart.service.dto.JwtResponse;
 import gosmart.service.dto.UserDto;
+import gosmart.service.exceptions.ResourceNotFoundException;
 import gosmart.service.service.UserService;
+import gosmart.service.utils.JwtTokenHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -18,7 +27,16 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("")
+    @Autowired
+    UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtTokenHelper jwtTokenHelper;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserDto userDto){
         return ResponseEntity.status(HttpStatus.OK).body(userService.registerUser(userDto));
     }
@@ -42,5 +60,41 @@ public class UserController {
     public ResponseEntity<ApiResponse> deleteUserById(@PathVariable String userId){
         userService.deleteUserById(userId);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse("User Deleted Successfully!!!",true));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtResponse> createToken(@RequestBody JwtAuthRequest request) throws Exception {
+
+        this.authenticate(request.getUsername(), request.getPassword());
+
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(request.getUsername());
+
+        String token = this.jwtTokenHelper.generateToken(userDetails);
+
+        JwtResponse response = new JwtResponse();
+        response.setToken(token);
+        return new ResponseEntity<JwtResponse>(response, HttpStatus.OK);
+
+    }
+
+    private void authenticate(String username, String password) throws Exception {
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
+                password);
+
+        try {
+
+            this.authenticationManager.authenticate(authenticationToken);
+
+        } catch (BadCredentialsException e) {
+            System.out.println("Invalid Detials !!");
+            throw new ResourceNotFoundException("Invalid username or password !!");
+        }
+
+    }
+
+    @PostMapping("/me/{userId}")
+    public ResponseEntity<UserDto> me(@PathVariable String userId){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserDetailsById(userId));
     }
 }

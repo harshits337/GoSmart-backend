@@ -10,6 +10,7 @@ import gosmart.service.models.Product;
 import gosmart.service.repository.OrderRepo;
 import gosmart.service.repository.ProductRepo;
 import gosmart.service.repository.UserRepo;
+import gosmart.service.service.CartService;
 import gosmart.service.service.OrderDetailsService;
 import gosmart.service.service.OrderService;
 import org.modelmapper.ModelMapper;
@@ -34,6 +35,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     OrderDetailsService orderDetailsService;
 
+    @Autowired
+    CartService cartService;
+
 
     @Override
     @Transactional
@@ -46,6 +50,7 @@ public class OrderServiceImpl implements OrderService {
         orderRepo.save(order);
         OrderDto savedOrder = orderToDto(order);
         savedOrder.setOrderList(orderDto.getOrderList());
+        cartService.clearCart(orderDto.getUserId());
         return savedOrder;
     }
 

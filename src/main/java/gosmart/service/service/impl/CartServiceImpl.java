@@ -76,6 +76,11 @@ public class CartServiceImpl implements CartService {
 
     }
 
+    @Override
+    public void clearCart(String userId) {
+        cartRepo.deleteAllByUserId(userId);
+    }
+
     public Cart dtoToCart(CartDto cartDto){
         return modelMapper.map(cartDto,Cart.class);
     }

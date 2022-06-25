@@ -8,6 +8,7 @@ import gosmart.service.repository.UserRepo;
 import gosmart.service.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,13 +27,19 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserRepo userRepo;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @Override
     @Transactional
     public UserDto registerUser(UserDto userDto) {
         if(findUserByEmail(userDto.getEmail())){
             throw new ResourceNotFoundException("Email Already Present!!!");
         }
+
         User user = dtoToUser(userDto);
+
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         user.setId(UUID.randomUUID().toString());
         user.setCreatedAt(Instant.now().toString());
         return UserToDto(userRepo.save(user));
