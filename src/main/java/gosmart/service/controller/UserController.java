@@ -95,7 +95,7 @@ public class UserController {
 
     }
 
-    @PostMapping("/me/{userId}")
+    @GetMapping("/me/{userId}")
     public ResponseEntity<UserDto> me(@PathVariable String userId){
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserDetailsById(userId));
     }
